@@ -1,0 +1,33 @@
+{
+  "name": "Muni Bond Lookup",
+  "description": "Explore US municipal bonds: reference data, pricing history, documents, cashflows, and bond search.",
+  "allowCustomization": true,
+  "prompts": [],
+  "tabs": {
+    "security_details_tab": {
+      "id": "security_details_tab",
+      "name": "Security Details",
+      "layout": [
+        { "i": "muni_reference",       "x": 0,  "y": 2,  "w": 10, "h": 28, "groups": ["Group 1"] },
+        { "i": "muni_pricing_chart",   "x": 10, "y": 2,  "w": 30, "h": 16, "groups": ["Group 1"] },
+        { "i": "muni_document_viewer", "x": 10, "y": 18, "w": 30, "h": 24, "groups": ["Group 1"] },
+        { "i": "muni_cashflows",       "x": 0,  "y": 30, "w": 10, "h": 16, "groups": ["Group 1"] }
+      ]
+    },
+    "bond_explorer_tab": {
+      "id": "bond_explorer_tab",
+      "name": "Bond Explorer",
+      "layout": [
+        { "i": "muni_bond_search", "x": 0, "y": 2, "w": 40, "h": 22, "groups": ["Group 1"] }
+      ]
+    }
+  },
+  "groups": [
+    {
+      "name": "Group 1",
+      "type": "param",
+      "paramName": "cusip",
+      "defaultValue": ""
+    }
+  ]
+}

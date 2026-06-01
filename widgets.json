@@ -1,0 +1,177 @@
+{
+  "muni_reference": {
+    "name": "Muni Bond Reference Data",
+    "description": "Full reference data for a US municipal bond, organised by section.",
+    "type": "markdown",
+    "endpoint": "/muni/reference",
+    "gridData": { "w": 10, "h": 28 },
+    "params": [
+      {
+        "paramName": "cusip",
+        "type": "text",
+        "label": "CUSIP",
+        "description": "9-character US CUSIP",
+        "value": ""
+      }
+    ]
+  },
+
+  "muni_pricing_chart": {
+    "name": "Muni Bond Pricing History",
+    "description": "Trade prices over time for a US municipal bond, coloured by trade type.",
+    "type": "chart",
+    "endpoint": "/muni/pricing_chart",
+    "gridData": { "w": 20, "h": 16 },
+    "runButton": true,
+    "params": [
+      {
+        "paramName": "cusip",
+        "type": "text",
+        "label": "CUSIP",
+        "description": "9-character US CUSIP",
+        "value": ""
+      },
+      {
+        "paramName": "start_date",
+        "type": "date",
+        "label": "Start Date",
+        "description": "Defaults to 1 year ago",
+        "value": "$currentDate-1y"
+      },
+      {
+        "paramName": "end_date",
+        "type": "date",
+        "label": "End Date",
+        "description": "Defaults to today",
+        "value": "$currentDate"
+      }
+    ]
+  },
+
+  "muni_document_viewer": {
+    "name": "Bond Documents",
+    "description": "Official statements and disclosure documents viewer. Select a document from the dropdown to open it.",
+    "type": "multi_file_viewer",
+    "endpoint": "/muni/document/view",
+    "gridData": { "w": 30, "h": 24 },
+    "params": [
+      {
+        "paramName": "cusip",
+        "type": "text",
+        "label": "CUSIP",
+        "description": "9-character US CUSIP",
+        "value": ""
+      },
+      {
+        "paramName": "file_id",
+        "type": "endpoint",
+        "label": "Documents",
+        "show": false,
+        "multiSelect": true,
+        "roles": ["fileSelector"],
+        "optionsEndpoint": "/muni/documents/options",
+        "optionsParams": { "cusip": "$cusip" }
+      }
+    ]
+  },
+
+  "muni_cashflows": {
+    "name": "Muni Bond Cashflows",
+    "description": "Cashflow schedules to maturity and to next call for a US municipal bond.",
+    "type": "markdown",
+    "endpoint": "/muni/cashflows",
+    "gridData": { "w": 20, "h": 14 },
+    "params": [
+      {
+        "paramName": "cusip",
+        "type": "text",
+        "label": "CUSIP",
+        "description": "9-character US CUSIP",
+        "value": ""
+      }
+    ]
+  },
+
+  "muni_bond_search": {
+    "name": "Bond Explorer",
+    "description": "Search and filter US municipal bonds. Click a CUSIP to load the bond in Security Details.",
+    "type": "table",
+    "endpoint": "/muni/search",
+    "gridData": { "w": 40, "h": 22 },
+    "params": [
+      { "paramName": "issuer_name",          "type": "text",   "label": "Issuer Name",           "description": "Filter by issuer name (partial match)",  "value": "" },
+      { "paramName": "states",               "type": "text",   "label": "States",                "description": "Comma-separated 2-letter state codes (e.g. CA,NY)", "value": "",
+        "options": [
+          {"label":"AL","value":"AL"},{"label":"AK","value":"AK"},{"label":"AZ","value":"AZ"},{"label":"AR","value":"AR"},
+          {"label":"CA","value":"CA"},{"label":"CO","value":"CO"},{"label":"CT","value":"CT"},{"label":"DC","value":"DC"},
+          {"label":"DE","value":"DE"},{"label":"FL","value":"FL"},{"label":"GA","value":"GA"},{"label":"HI","value":"HI"},
+          {"label":"ID","value":"ID"},{"label":"IL","value":"IL"},{"label":"IN","value":"IN"},{"label":"IA","value":"IA"},
+          {"label":"KS","value":"KS"},{"label":"KY","value":"KY"},{"label":"LA","value":"LA"},{"label":"ME","value":"ME"},
+          {"label":"MD","value":"MD"},{"label":"MA","value":"MA"},{"label":"MI","value":"MI"},{"label":"MN","value":"MN"},
+          {"label":"MS","value":"MS"},{"label":"MO","value":"MO"},{"label":"MT","value":"MT"},{"label":"NE","value":"NE"},
+          {"label":"NV","value":"NV"},{"label":"NH","value":"NH"},{"label":"NJ","value":"NJ"},{"label":"NM","value":"NM"},
+          {"label":"NY","value":"NY"},{"label":"NC","value":"NC"},{"label":"ND","value":"ND"},{"label":"OH","value":"OH"},
+          {"label":"OK","value":"OK"},{"label":"OR","value":"OR"},{"label":"PA","value":"PA"},{"label":"RI","value":"RI"},
+          {"label":"SC","value":"SC"},{"label":"SD","value":"SD"},{"label":"TN","value":"TN"},{"label":"TX","value":"TX"},
+          {"label":"UT","value":"UT"},{"label":"VT","value":"VT"},{"label":"VA","value":"VA"},{"label":"WA","value":"WA"},
+          {"label":"WV","value":"WV"},{"label":"WI","value":"WI"},{"label":"WY","value":"WY"}
+        ],
+        "multiSelect": true
+      },
+      { "paramName": "sectors",              "type": "text",   "label": "Sectors",               "description": "Bond issuer sectors",                     "value": "",
+        "options": [
+          {"label":"Education","value":"education"},{"label":"Healthcare","value":"healthcare"},
+          {"label":"Housing","value":"housing"},{"label":"Industrial","value":"industrial"},
+          {"label":"Local","value":"local"},{"label":"State","value":"state"},
+          {"label":"Tobacco","value":"tobacco"},{"label":"Transportation","value":"transportation"},
+          {"label":"Utilities","value":"utilities"}
+        ],
+        "multiSelect": true
+      },
+      { "paramName": "interest_types",       "type": "text",   "label": "Interest Types",        "description": "Types of interest",                       "value": "",
+        "options": [
+          {"label":"Fixed Rate","value":"fixed rate"},{"label":"Variable Rate","value":"variable rate"},
+          {"label":"CAB","value":"cab"},{"label":"CAB-to-Fixed","value":"cab-to-fixed"},
+          {"label":"Step Rate","value":"step rate"},{"label":"Term Rate","value":"term rate"},
+          {"label":"Zero / Discount","value":"zero rate / discount rate"}
+        ],
+        "multiSelect": true
+      },
+      { "paramName": "sources_of_repayment", "type": "text",   "label": "Source of Repayment",  "description": "How the bond is repaid",                  "value": "",
+        "options": [
+          {"label":"Revenue","value":"Revenue"},
+          {"label":"General Obligation","value":"General Obligation"},
+          {"label":"Double Barrel","value":"Double Barrel"}
+        ],
+        "multiSelect": true
+      },
+      { "paramName": "coupon_min",           "type": "text",   "label": "Coupon Min (%)",        "description": "Minimum coupon rate",                     "value": "" },
+      { "paramName": "coupon_max",           "type": "text",   "label": "Coupon Max (%)",        "description": "Maximum coupon rate",                     "value": "" },
+      { "paramName": "maturity_date_min",    "type": "date",   "label": "Maturity From",         "description": "Minimum maturity date",                   "value": "" },
+      { "paramName": "maturity_date_max",    "type": "date",   "label": "Maturity To",           "description": "Maximum maturity date",                   "value": null },
+      { "paramName": "last_traded_since",    "type": "date",   "label": "Last Traded Since",     "description": "Only include bonds traded since this date","value": null },
+      { "paramName": "limit",               "type": "text",   "label": "Result Limit",          "description": "Maximum number of results (default 100)",  "value": "100" }
+    ],
+    "data": {
+      "table": {
+        "columnsDefs": [
+          {
+            "field": "cusip", "headerName": "CUSIP", "cellDataType": "text", "pinned": "left", "width": 110,
+            "renderFn": "cellOnClick",
+            "renderFnParams": { "actionType": "groupBy", "groupBy": { "paramName": "cusip", "valueField": "cusip" } }
+          },
+          { "field": "ticker",        "headerName": "Ticker",        "cellDataType": "text",       "flex": 2 },
+          { "field": "issuer_name",   "headerName": "Issuer",        "cellDataType": "text",       "flex": 3 },
+          { "field": "state",         "headerName": "State",         "cellDataType": "text",       "width": 70 },
+          { "field": "coupon",        "headerName": "Coupon",        "cellDataType": "text",       "width": 90 },
+          { "field": "interest_type", "headerName": "Type",          "cellDataType": "text",       "width": 110 },
+          { "field": "maturity_date", "headerName": "Maturity",      "cellDataType": "dateString", "width": 110 },
+          { "field": "callable",      "headerName": "Callable",      "cellDataType": "text",       "width": 80 },
+          { "field": "rating",        "headerName": "Rating",        "cellDataType": "text",       "width": 130 },
+          { "field": "has_os",        "headerName": "Official Stmt", "cellDataType": "text",       "width": 100 }
+        ]
+      }
+    }
+  }
+
+}
