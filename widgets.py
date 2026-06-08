@@ -760,6 +760,32 @@ def stats_kv_table() -> dict[str, Any]:
     }
 
 
+def aggrid_stacked_stats_chart_data() -> dict[str, Any]:
+    return {
+        "table": {
+            "chartView": {
+                "enabled": True,
+                "chartType": "stackedColumn",
+            },
+        },
+    }
+
+
+def aggrid_top_issuers_chart_data() -> dict[str, Any]:
+    return {
+        "table": {
+            "chartView": {
+                "enabled": True,
+                "chartType": "groupedBar",
+            },
+            "columnsDefs": [
+                table_col("issuer_name", "Issuer", cellDataType="text", chartDataType="category", flex=3),
+                table_col("value", "Value", cellDataType="number", chartDataType="series", flex=2),
+            ],
+        },
+    }
+
+
 def cusip_click_col() -> dict[str, Any]:
     return table_col(
         "cusip",
@@ -907,8 +933,8 @@ WIDGETS: dict[str, dict[str, Any]] = {
     "muni_stats_issuance": {
         "name": "Issuance",
         "description": "Time series issuance stats over the selected date range and filters.",
-        "type": "chart",
-        "endpoint": "/muni/stats/issuance_chart",
+        "type": "table",
+        "endpoint": "/muni/stats/issuance_aggrid_chart",
         "gridData": {"w": 13, "h": 12},
         "runButton": True,
         "params": [
@@ -923,6 +949,7 @@ WIDGETS: dict[str, dict[str, Any]] = {
                 *date_range_params(start="2025-01-01"),
             ],
         ],
+        "data": aggrid_stacked_stats_chart_data(),
     },
 
     "muni_stats_trade_activity": {
@@ -978,8 +1005,8 @@ WIDGETS: dict[str, dict[str, Any]] = {
     "muni_stats_trade_volume_monthly": {
         "name": "Trade Activity: Volume Trend",
         "description": "Trade volume trend for the selected period.",
-        "type": "chart",
-        "endpoint": "/muni/stats/trade_activity_chart",
+        "type": "table",
+        "endpoint": "/muni/stats/trade_activity_aggrid_chart",
         "gridData": {"w": 20, "h": 16},
         "runButton": True,
         "params": [
@@ -994,6 +1021,7 @@ WIDGETS: dict[str, dict[str, Any]] = {
                 *date_range_params(start="2025-01-01"),
             ],
         ],
+        "data": aggrid_stacked_stats_chart_data(),
     },
 
     "muni_stats_trade_customer_bought_monthly": {
@@ -1099,8 +1127,8 @@ WIDGETS: dict[str, dict[str, Any]] = {
     "muni_stats_top_issuers_chart": {
         "name": "Top Issuers Chart",
         "description": "Bar chart of top issuers by selected metric.",
-        "type": "chart",
-        "endpoint": "/muni/stats/top_issuers_chart",
+        "type": "table",
+        "endpoint": "/muni/stats/top_issuers_aggrid_chart",
         "gridData": {"w": 20, "h": 18},
         "runButton": True,
         "params": [
@@ -1117,5 +1145,6 @@ WIDGETS: dict[str, dict[str, Any]] = {
                 *date_range_params(start="2025-01-01"),
             ],
         ],
+        "data": aggrid_top_issuers_chart_data(),
     },
 }

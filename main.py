@@ -244,12 +244,15 @@ def _stats_filters_query(
 
 
 def _post_muni_stats_rows(endpoint: str, body: dict) -> list[dict]:
-    with httpx.Client(timeout=30) as client:
-        resp = client.post(
-            f"{TERRAPIN_BASE_URL}/api/v1/{endpoint}",
-            headers=terrapin_headers(),
-            json=body,
-        )
+    try:
+        with httpx.Client(timeout=60) as client:
+            resp = client.post(
+                f"{TERRAPIN_BASE_URL}/api/v1/{endpoint}",
+                headers=terrapin_headers(),
+                json=body,
+            )
+    except httpx.TimeoutException as exc:
+        raise HTTPException(status_code=504, detail=f"Terrapin stats request timed out for {endpoint}.") from exc
     if resp.status_code != 200:
         raise HTTPException(status_code=resp.status_code, detail=resp.text)
     data = resp.json().get("data", [])
@@ -475,6 +478,45 @@ def _stacked_bar_chart(
             "annotations": annotations,
         },
     }
+
+
+def _stats_rows_for_aggrid_chart(
+    rows: list[dict],
+    *,
+    metric_key: str,
+    metric_label: str,
+    period: str,
+    group_by: str,
+) -> list[dict]:
+    if not rows:
+        return []
+
+    period_values: list[str] = []
+    group_values: list[str] = []
+    grouped_values: dict[str, dict[str, float]] = {}
+    for row in rows:
+        period_value = str(row.get("period") or "all") if period != "all" else "all"
+        group_value = (
+            str(row.get("group_key") if row.get("group_key") is not None else "undefined")
+            if group_by != "none"
+            else metric_label
+        )
+        if period_value not in period_values:
+            period_values.append(period_value)
+        if group_value not in group_values:
+            group_values.append(group_value)
+        grouped_values.setdefault(period_value, {})[group_value] = float(row.get(metric_key) or 0)
+
+    return [
+        {
+            "period": period_value,
+            **{
+                group_value: grouped_values.get(period_value, {}).get(group_value, 0)
+                for group_value in group_values
+            },
+        }
+        for period_value in period_values
+    ]
 
 
 # ---------------------------------------------------------------------------
@@ -1397,6 +1439,32 @@ def muni_stats_issuance_chart(
     )
 
 
+@app.get("/muni/stats/issuance_aggrid_chart")
+def muni_stats_issuance_aggrid_chart(
+    start_date: str = Query(..., description="YYYY-MM-DD"),
+    end_date: str = Query(..., description="YYYY-MM-DD"),
+    metrics: Optional[str] = Query(None, description="Single metric key"),
+    period: str = Query("month"),
+    group_by: str = Query("none"),
+    filters: dict = Depends(_stats_filters_query),
+):
+    period = _validated_period(period)
+    group_by = _validated_group_by(group_by)
+    api_group_by = _group_by_for_api(group_by)
+    metric_key = _selected_metric_keys(metrics, ISSUANCE_METRIC_KEYS)[0]
+
+    body = _build_muni_stats_filters(**filters)
+    body.update({"start_date": start_date, "end_date": end_date, "period": period, "group_by": api_group_by})
+    rows = _post_muni_stats_rows("muni_stats_issuance", body)
+    return _stats_rows_for_aggrid_chart(
+        rows,
+        metric_key=metric_key,
+        metric_label=ISSUANCE_METRIC_LABELS[metric_key],
+        period=period,
+        group_by=group_by,
+    )
+
+
 @app.get("/muni/stats/trade_activity_chart")
 def muni_stats_trade_activity_chart(
     start_date: str = Query(..., description="YYYY-MM-DD"),
@@ -1426,6 +1494,32 @@ def muni_stats_trade_activity_chart(
         group_by=group_by,
         theme=theme,
         title=resolved_title,
+    )
+
+
+@app.get("/muni/stats/trade_activity_aggrid_chart")
+def muni_stats_trade_activity_aggrid_chart(
+    start_date: str = Query(..., description="YYYY-MM-DD"),
+    end_date: str = Query(..., description="YYYY-MM-DD"),
+    metrics: Optional[str] = Query(None, description="Single metric key"),
+    period: str = Query("month"),
+    group_by: str = Query("none"),
+    filters: dict = Depends(_stats_filters_query),
+):
+    period = _validated_period(period)
+    group_by = _validated_group_by(group_by)
+    api_group_by = _group_by_for_api(group_by)
+    metric_key = _selected_metric_keys(metrics, TRADE_ACTIVITY_METRIC_KEYS)[0]
+
+    body = _build_muni_stats_filters(**filters)
+    body.update({"start_date": start_date, "end_date": end_date, "period": period, "group_by": api_group_by})
+    rows = _post_muni_stats_rows("muni_stats_trade_activity", body)
+    return _stats_rows_for_aggrid_chart(
+        rows,
+        metric_key=metric_key,
+        metric_label=TRADE_ACTIVITY_METRIC_LABELS[metric_key],
+        period=period,
+        group_by=group_by,
     )
 
 
@@ -1470,6 +1564,28 @@ def _post_top_issuers_rows(body: dict) -> list[dict]:
     if not rows:
         raise HTTPException(status_code=404, detail="No top issuers found for the selected filters.")
     return rows
+
+
+@app.get("/muni/stats/top_issuers_aggrid_chart")
+def muni_stats_top_issuers_aggrid_chart(
+    start_date: str = Query(..., description="YYYY-MM-DD"),
+    end_date: str = Query(..., description="YYYY-MM-DD"),
+    rank_by: str = Query("trade_volume"),
+    limit: int = Query(25),
+    filters: dict = Depends(_stats_filters_query),
+):
+    rank_by = _validated_rank_by(rank_by)
+    body = _build_muni_stats_filters(**filters)
+    body.update({"start_date": start_date, "end_date": end_date, "rank_by": rank_by, "limit": limit})
+
+    rows = _post_top_issuers_rows(body)
+    return [
+        {
+            "issuer_name": r.get("issuer_name") or "—",
+            "value": float(r.get(rank_by) or 0),
+        }
+        for r in rows
+    ]
 
 
 @app.get("/muni/stats/top_issuers_chart")
