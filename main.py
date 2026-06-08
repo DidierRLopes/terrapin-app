@@ -1064,6 +1064,11 @@ button:hover, select:hover {{
   padding: 0 8px;
   color: var(--muted);
 }}
+.header-actions {{
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}}
 @media (max-width: 760px) {{
   .grid {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }}
   .filter-section.flags .controls {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }}
@@ -1078,7 +1083,9 @@ button:hover, select:hover {{
 <body>
   <div class="header">
     <div class="count" id="count">0 active filters</div>
-    <button class="clear-all" data-action="clear-all">Clear all</button>
+    <div class="header-actions">
+      <button class="clear-all" data-action="clear-all">Clear all</button>
+    </div>
   </div>
   <main class="grid" id="filters"></main>
   <script>
@@ -1123,15 +1130,15 @@ button:hover, select:hover {{
       const serialiseParams = () => Object.fromEntries(
         controls.map((control) => [control.name, state[control.name] ?? control.defaultValue ?? ""])
       );
-      const emit = (paramName) => {{
+      const emitParams = (paramName) => {{
+        const params = serialiseParams();
         const message = {{
-          source: "terrapin-muni-filters",
-          type: "openbb:params:update",
+          type: "openbb:widget-params:update",
           paramName,
-          value: state[paramName],
-          params: serialiseParams()
+          value: paramName === "*" ? undefined : params[paramName],
+          params
         }};
-        window.dispatchEvent(new CustomEvent("terrapin:filters", {{ detail: message }}));
+        window.dispatchEvent(new CustomEvent("openbb:widget-params:update", {{ detail: message }}));
         if (window.parent && window.parent !== window) {{
           window.parent.postMessage(message, "*");
         }}
@@ -1245,7 +1252,7 @@ button:hover, select:hover {{
           target.value = "";
         }}
         render();
-        emit(control.name);
+        emitParams(control.name);
       }});
       document.addEventListener("click", (event) => {{
         const target = event.target.closest("[data-action]");
@@ -1253,7 +1260,7 @@ button:hover, select:hover {{
         if (target.dataset.action === "clear-all") {{
           controls.forEach((control) => setValue(control, control.defaultValue));
           render();
-          emit("*");
+          emitParams("*");
           return;
         }}
         const control = byName.get(target.dataset.param);
@@ -1267,7 +1274,7 @@ button:hover, select:hover {{
           setValue(control, nextValue);
         }}
         render();
-        emit(control.name);
+        emitParams(control.name);
       }});
       render();
     }})();
