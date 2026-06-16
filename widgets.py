@@ -662,7 +662,8 @@ def stats_filter_param_rows(*, states: str = ALL_STATES) -> list[list[dict[str, 
 
 
 def hidden_shared_stats_param_rows(*, states: str = ALL_STATES) -> list[list[dict[str, Any]]]:
-    return hide_shared_stats_params(stats_filter_param_rows(states=states))
+    rows = hide_shared_stats_params(stats_filter_param_rows(states=states))
+    return [[param for row in rows for param in row]]
 
 
 def hidden_stats_filter_param_row(*, states: str = ALL_STATES) -> list[list[dict[str, Any]]]:
@@ -897,7 +898,7 @@ WIDGETS: dict[str, dict[str, Any]] = {
         "type": "html",
         "endpoint": "/muni/stats/filters_summary",
         "gridData": {"w": 40, "h": 19},
-        "runButton": True,
+        "runButton": False,
         "params": hidden_stats_filter_param_row(),
     },
 
@@ -907,7 +908,7 @@ WIDGETS: dict[str, dict[str, Any]] = {
         "type": "table",
         "endpoint": "/muni/stats/outstanding",
         "gridData": {"w": 13, "h": 12},
-        "runButton": True,
+        "runButton": False,
         "params": [
             *hidden_shared_stats_param_rows(),
             [
@@ -936,7 +937,7 @@ WIDGETS: dict[str, dict[str, Any]] = {
         "type": "table",
         "endpoint": "/muni/stats/issuance_aggrid_chart",
         "gridData": {"w": 13, "h": 12},
-        "runButton": True,
+        "runButton": False,
         "params": [
             *hidden_shared_stats_param_rows(),
             [
@@ -958,7 +959,7 @@ WIDGETS: dict[str, dict[str, Any]] = {
         "type": "chart",
         "endpoint": "/muni/stats/trade_activity_chart",
         "gridData": {"w": 14, "h": 12},
-        "runButton": True,
+        "runButton": False,
         "params": [
             *hidden_shared_stats_param_rows(),
             [
@@ -979,7 +980,7 @@ WIDGETS: dict[str, dict[str, Any]] = {
         "type": "table",
         "endpoint": "/muni/stats/outstanding",
         "gridData": {"w": 20, "h": 16},
-        "runButton": True,
+        "runButton": False,
         "params": [
             *hidden_shared_stats_param_rows(),
             [
@@ -1008,7 +1009,7 @@ WIDGETS: dict[str, dict[str, Any]] = {
         "type": "table",
         "endpoint": "/muni/stats/trade_activity_aggrid_chart",
         "gridData": {"w": 20, "h": 16},
-        "runButton": True,
+        "runButton": False,
         "params": [
             *hidden_shared_stats_param_rows(),
             [
@@ -1030,7 +1031,7 @@ WIDGETS: dict[str, dict[str, Any]] = {
         "type": "chart",
         "endpoint": "/muni/stats/trade_activity_chart",
         "gridData": {"w": 20, "h": 16},
-        "runButton": True,
+        "runButton": False,
         "params": [
             *hidden_shared_stats_param_rows(),
             [
@@ -1051,7 +1052,7 @@ WIDGETS: dict[str, dict[str, Any]] = {
         "type": "chart",
         "endpoint": "/muni/stats/issuance_chart",
         "gridData": {"w": 20, "h": 16},
-        "runButton": True,
+        "runButton": False,
         "params": [
             *hidden_shared_stats_param_rows(),
             [
@@ -1072,7 +1073,7 @@ WIDGETS: dict[str, dict[str, Any]] = {
         "type": "chart",
         "endpoint": "/muni/stats/issuance_chart",
         "gridData": {"w": 20, "h": 16},
-        "runButton": True,
+        "runButton": False,
         "params": [
             *hidden_shared_stats_param_rows(),
             [
@@ -1093,7 +1094,7 @@ WIDGETS: dict[str, dict[str, Any]] = {
         "type": "table",
         "endpoint": "/muni/stats/top_issuers",
         "gridData": {"w": 40, "h": 18},
-        "runButton": True,
+        "runButton": False,
         "params": [
             *hidden_shared_stats_param_rows(),
             [
@@ -1130,7 +1131,7 @@ WIDGETS: dict[str, dict[str, Any]] = {
         "type": "table",
         "endpoint": "/muni/stats/top_issuers_aggrid_chart",
         "gridData": {"w": 20, "h": 18},
-        "runButton": True,
+        "runButton": False,
         "params": [
             *hidden_shared_stats_param_rows(),
             [
